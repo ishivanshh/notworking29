@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Week 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: #fff5f5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .romantic-title {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .day-card {
+            aspect-ratio: 1 / 1;
+            transition: all 0.3s ease;
+        }
+
+        .heart-pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .city-pulse {
+            animation: ring 2s infinite;
+        }
+
+        @keyframes ring {
+            0% { r: 4; opacity: 1; }
+            100% { r: 12; opacity: 0; }
+        }
+
+        .emoji-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100;
+            animation: floatUp 3s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+        }
+
+        .modal-active {
+            display: flex !important;
+        }
+
+        /* Letter Styles */
+        .letter-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.8s cubic-bezier(0.4, 0, 0.2, 1), padding 0.5s ease;
+        }
+
+        .letter-open .letter-content {
+            max-height: 2000px;
+            padding: 1.5rem;
+        }
+
+        .letter-paper {
+            background: #fffdfa;
+            background-image: radial-gradient(#f1f1f1 1.1px, transparent 1.1px);
+            background-size: 22px 22px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f3f3f3 25%, #ffe4e6 50%, #f3f3f3 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .timer-badge {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 10px rgba(244, 114, 182, 0.2);
+            backdrop-blur: 4px;
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #be185d;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 99px;
+            font-size: 0.875rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Enhanced Connection Line Animation */
+        .traveling-heart {
+            offset-path: path('M 390 270 Q 425 295 460 330');
+            animation: moveHeart 3s infinite ease-in-out;
+        }
+
+        @keyframes moveHeart {
+            0% { offset-distance: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { offset-distance: 100%; opacity: 0; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex items-center justify-center min-h-screen">
+    
+    <!-- Toast Notifications -->
+    <div id="calendar-toast" class="toast-msg">The magic begins on Feb 7th! ❤️</div>
+    <div id="letter-toast" class="toast-msg">This surprise unlocks after Feb 13th! 💌</div>
+
+    <!-- Countdown Timer -->
+    <div id="countdown-wrapper" class="fixed top-4 right-4 z-40 hidden">
+        <div class="timer-badge border border-pink-200 rounded-2xl p-3 flex flex-col items-center">
+            <span class="text-[10px] uppercase font-bold text-pink-500 tracking-wider">Starts In</span>
+            <div id="countdown-timer" class="font-mono text-pink-600 font-bold text-lg">00:00:00:00</div>
+        </div>
+    </div>
+
+    <div class="max-w-md w-full mx-auto space-y-6 relative">
+        <!-- Main Calendar Container -->
+        <div class="bg-white/85 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-pink-100 relative">
+            
+            <!-- Beautiful Map Background INSIDE the calendar card -->
+            <div class="absolute inset-0 z-0 opacity-40 pointer-events-none p-4">
+                <svg viewBox="0 0 1000 1000" class="w-full h-full drop-shadow-lg" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- India Base -->
+                    <path d="M420,120 L480,150 L520,200 L550,280 L650,320 L720,400 L750,550 L700,680 L620,780 L520,880 L480,950 L440,880 L350,750 L280,600 L250,450 L220,380 L280,280 L350,200 Z" fill="#FFF1F2" stroke="#FDA4AF" stroke-width="3" />
+                    
+                    <!-- Connection Arc -->
+                    <path id="connection-arc" d="M 390 270 Q 425 295 460 330" stroke="#F43F5E" stroke-width="2" stroke-dasharray="6,4" opacity="0.6" />
+                    
+                    <!-- Ghaziabad (GZB) -->
+                    <circle cx="390" cy="270" r="4" fill="#BE185D" />
+                    <circle cx="390" cy="270" r="4" stroke="#BE185D" stroke-width="1" fill="none" class="city-pulse" />
+                    <text x="340" y="265" fill="#9D174D" font-size="16" font-weight="bold" font-family="Quicksand">GZB</text>
+                    
+                    <!-- Lucknow (LKO) -->
+                    <circle cx="460" cy="330" r="4" fill="#BE185D" />
+                    <circle cx="460" cy="330" r="4" stroke="#BE185D" stroke-width="1" fill="none" class="city-pulse" />
+                    <text x="470" y="345" fill="#9D174D" font-size="16" font-weight="bold" font-family="Quicksand">LKO</text>
+                    
+                    <!-- Moving Heart -->
+                    <text font-size="28" class="traveling-heart">❤️</text>
+                </svg>
+            </div>
+
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-pink-500 to-rose-400 p-6 text-white text-center relative z-10 shadow-md">
+                <h1 class="romantic-title text-4xl mb-2">Valentine's Week</h1>
+                <p class="text-pink-50 font-medium tracking-wide">February 2026</p>
+            </div>
+
+            <!-- Calendar Body -->
+            <div class="p-6 relative z-10">
+                <div class="calendar-grid mb-4">
+                    <div class="text-center text-[10px] font-bold text-rose-300 uppercase tracking-tighter">Sun</div>
+                    <div class="text-center text-[10px] font-bold text-rose-300 uppercase tracking-tighter">Mon</div>
+                    <div class="text-center text-[10px] font-bold text-rose-300 uppercase tracking-tighter">Tue</div>
+                    <div class="text-center text-[10px] font-bold text-rose-300 uppercase tracking-tighter">Wed</div>
+                    <div class="text-center text-[10px] font-bold text-rose-300 uppercase tracking-tighter">Thu</div>
+                    <div class="text-center text-[10px] font-bold text-rose-300 uppercase tracking-tighter">Fri</div>
+                    <div class="text-center text-[10px] font-bold text-rose-300 uppercase tracking-tighter">Sat</div>
+                </div>
+
+                <div id="calendar-days" class="calendar-grid">
+                    <!-- Days will be injected here -->
+                </div>
+            </div>
+
+            <div class="p-4 text-center text-pink-400 text-xs italic relative z-10 bg-white/40 backdrop-blur-sm">
+                Each heart holds a promise for us...
+            </div>
+        </div>
+
+        <!-- For You Section (Letter) -->
+        <div id="letter-container" class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-pink-100 overflow-hidden transition-all duration-500">
+            <button onclick="toggleLetter()" class="w-full p-5 flex items-center justify-center gap-3 text-pink-600 font-bold hover:bg-pink-50 transition-colors">
+                <span class="text-2xl">✉️</span>
+                <span class="text-xl romantic-title">For You</span>
+                <span id="chevron" class="transition-transform duration-300">▼</span>
+            </button>
+            
+            <div class="letter-content px-0">
+                <div class="letter-paper rounded-2xl p-6 border border-amber-100 text-gray-700 leading-relaxed italic relative">
+                    <button onclick="generateAIPoem()" id="ai-poem-btn" class="absolute top-4 right-4 text-[10px] bg-pink-100 text-pink-600 px-3 py-1 rounded-full hover:bg-pink-200 transition-all flex items-center gap-1 shadow-sm">
+                        ✨ Poetic Magic
+                    </button>
+                    
+                    <p class="mb-4 font-bold romantic-title text-2xl text-pink-500">My Dearest,</p>
+                    <div id="letter-text" class="text-sm">
+                        <p class="mb-4">
+                            As we approach this beautiful week in February 2026, I found myself thinking about all the little moments that make our bond so special. Life has a funny way of bringing people together, but keeping them close requires a kind of magic that I only feel when I'm with you. Whether it’s the quiet mornings or the adventurous nights, every second feels like a line in a poem I never want to finish reading.
+                        </p>
+                        <p class="mb-4">
+                            You are the rose in my garden, the chocolate in my life, and the promise I intend to keep forever. This calendar is just a small way to count down the days until we celebrate the love that has grown so effortlessly between us. I hope every heart you click on reminds you of a different reason why you are so incredibly cherished.
+                        </p>
+                    </div>
+                    <p class="text-right font-bold romantic-title text-2xl text-pink-500 mt-6">Forever Yours ❤️</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay Modal -->
+    <div id="wish-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-6">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl transform transition-all scale-100">
+            <div id="modal-emoji" class="text-6xl mb-4"></div>
+            <h2 id="modal-title" class="romantic-title text-3xl text-pink-600 mb-2"></h2>
+            <p id="modal-wish" class="text-gray-600 text-lg mb-4 leading-relaxed"></p>
+            
+            <div id="ai-suggestion-box" class="bg-pink-50 rounded-xl p-3 mb-6 text-sm text-pink-700 hidden">
+                <div class="font-bold flex items-center justify-center gap-1 mb-1 italic">
+                    ✨ AI Romantic Tip:
+                </div>
+                <div id="ai-suggestion-text"></div>
+            </div>
+
+            <button onclick="closeModal()" class="bg-pink-500 hover:bg-pink-600 text-white px-8 py-2 rounded-full font-bold transition-colors w-full">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = ""; 
+        const CALENDAR_START = new Date("February 7, 2026 00:00:00").getTime();
+        const LETTER_START = new Date("February 14, 2026 00:00:00").getTime();
+
+        const vWeek = {
+            7: { name: "Rose Day", wish: "Happy Rose Day cutie! 🌹", emoji: "🌹" },
+            8: { name: "Propose Day", wish: "Happy Propose Day cutie! 💍", emoji: "💍" },
+            9: { name: "Chocolate Day", wish: "Happy Chocolate Day cutie! 🍫", emoji: "🍫" },
+            10: { name: "Teddy Day", wish: "Happy Teddy Day cutie! 🧸", emoji: "🧸" },
+            11: { name: "Promise Day", wish: "Happy Promise Day cutie! 🤝", emoji: "🤝" },
+            12: { name: "Hug Day", wish: "Happy Hug Day cutie! 🤗", emoji: "🤗" },
+            13: { name: "Kiss Day", wish: "Happy Kiss Day cutie! 💋", emoji: "💋" },
+            14: { name: "Valentine's Day", wish: "Happy Valentine's Day cutie! ❤️", emoji: "❤️" }
+        };
+
+        function startCountdown() {
+            const timerWrapper = document.getElementById('countdown-wrapper');
+            const timerDisplay = document.getElementById('countdown-timer');
+
+            const update = () => {
+                const now = new Date().getTime();
+                const distance = CALENDAR_START - now;
+
+                if (distance < 0) {
+                    timerWrapper.classList.add('hidden');
+                    return;
+                }
+
+                timerWrapper.classList.remove('hidden');
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                timerDisplay.innerText = 
+                    `${days.toString().padStart(2, '0')}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            };
+
+            update();
+            setInterval(update, 1000);
+        }
+
+        function showToast(id) {
+            const toast = document.getElementById(id);
+            toast.style.opacity = '1';
+            setTimeout(() => toast.style.opacity = '0', 3000);
+        }
+
+        async function callGemini(prompt, systemPrompt = "You are a romantic poet.") {
+            let delay = 1000;
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            systemInstruction: { parts: [{ text: systemPrompt }] }
+                        })
+                    });
+                    const data = await response.json();
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text;
+                } catch (e) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+            return null;
+        }
+
+        async function generateAIPoem() {
+            const btn = document.getElementById('ai-poem-btn');
+            const letterBox = document.getElementById('letter-text');
+            const originalHTML = letterBox.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = "✨ Casting Spell...";
+            letterBox.classList.add('loading-shimmer', 'rounded-lg', 'p-4');
+
+            const prompt = "Take this love letter and rewrite it into a beautiful, soulful, and poetic version for 2026. Keep it around 150 words and extremely romantic. Text: " + letterBox.innerText;
+            const poem = await callGemini(prompt, "You are a world-class romantic poet like Rumi or Neruda.");
+
+            letterBox.classList.remove('loading-shimmer', 'p-4');
+            if (poem) {
+                letterBox.innerHTML = `<p class="whitespace-pre-line">${poem}</p>`;
+                btn.innerHTML = "✨ Magic Done";
+                spawnEmojis('✨');
+            } else {
+                letterBox.innerHTML = originalHTML;
+                btn.innerHTML = "✨ Try Magic Again";
+            }
+            btn.disabled = false;
+        }
+
+        async function getAISuggestion(dayName) {
+            const suggestionBox = document.getElementById('ai-suggestion-box');
+            const suggestionText = document.getElementById('ai-suggestion-text');
+            suggestionBox.classList.remove('hidden');
+            suggestionText.innerHTML = "Thinking of something sweet...";
+
+            const prompt = `Give a unique, creative, and cute 1-sentence tip/idea to celebrate ${dayName} for a couple in 2026. Make it specific to the day's theme.`;
+            const suggestion = await callGemini(prompt, "You are a creative Valentine's event planner.");
+            
+            if (suggestion) {
+                suggestionText.innerText = suggestion;
+            } else {
+                suggestionBox.classList.add('hidden');
+            }
+        }
+
+        function initCalendar() {
+            const container = document.getElementById('calendar-days');
+            for (let i = 1; i <= 28; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = `day-card relative flex flex-col items-center justify-center rounded-xl border border-pink-50 text-[10px] font-semibold text-gray-700 bg-pink-50/30`;
+                const dayLabel = document.createElement('span');
+                dayLabel.innerText = i;
+                dayDiv.appendChild(dayLabel);
+                if (vWeek[i]) {
+                    dayDiv.classList.add('cursor-pointer', 'bg-rose-100', 'border-rose-300', 'hover:scale-105', 'z-10');
+                    dayDiv.onclick = () => showWish(i);
+                    const heart = document.createElement('div');
+                    heart.innerHTML = '❤️';
+                    heart.className = 'heart-pulse text-[8px] mt-0.5';
+                    dayDiv.appendChild(heart);
+                }
+                container.appendChild(dayDiv);
+            }
+        }
+
+        function toggleLetter() {
+            const now = new Date().getTime();
+            if (now < LETTER_START) {
+                showToast('letter-toast');
+                return;
+            }
+
+            const container = document.getElementById('letter-container');
+            const chevron = document.getElementById('chevron');
+            container.classList.toggle('letter-open');
+            if(container.classList.contains('letter-open')) {
+                chevron.style.transform = 'rotate(180deg)';
+                spawnEmojis('💌');
+            } else {
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function showWish(day) {
+            const now = new Date().getTime();
+            if (now < CALENDAR_START) {
+                showToast('calendar-toast');
+                return;
+            }
+
+            const data = vWeek[day];
+            document.getElementById('modal-title').innerText = data.name;
+            document.getElementById('modal-wish').innerText = data.wish;
+            document.getElementById('modal-emoji').innerText = data.emoji;
+            document.getElementById('wish-modal').classList.add('modal-active');
+            spawnEmojis(data.emoji);
+            getAISuggestion(data.name);
+        }
+
+        function closeModal() {
+            document.getElementById('wish-modal').classList.remove('modal-active');
+            document.getElementById('ai-suggestion-box').classList.add('hidden');
+        }
+
+        function spawnEmojis(emoji) {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const el = document.createElement('div');
+                    el.className = 'emoji-particle';
+                    el.innerText = emoji;
+                    el.style.left = Math.random() * 100 + 'vw';
+                    el.style.top = '110vh';
+                    el.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        window.onload = () => {
+            initCalendar();
+            startCountdown();
+        };
+    </script>
+</body>
+</html>
