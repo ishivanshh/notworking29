@@ -59,21 +59,28 @@
             100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
         }
 
-        .emoji-falling {
+        /* Dropping Photos Animation */
+        .dropping-photo {
             position: fixed;
-            pointer-events: none;
-            z-index: 100;
-            animation: floatDown 4s linear forwards;
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            top: -100px;
+            animation: dropLoop 6s linear infinite;
         }
 
-        @keyframes floatDown {
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+        @keyframes dropLoop {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            90% { opacity: 1; }
             100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
         }
 
         .modal-active { display: flex !important; }
 
-        /* Rules Styles */
         .rules-content {
             max-height: 0;
             overflow: hidden;
@@ -89,17 +96,6 @@
             background: #ffffff;
             border-radius: 1.5rem;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-        }
-
-        .loading-shimmer {
-            background: linear-gradient(90deg, #f3f3f3 25%, #ffe4e6 50%, #f3f3f3 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
         }
 
         .timer-badge {
@@ -145,8 +141,6 @@
 
         @keyframes drawRoute { to { stroke-dashoffset: 0; } }
 
-        .delivery-bike { transition: transform 10s linear; }
-        
         .progress-line {
             height: 4px;
             background: #e2e8f0;
@@ -158,30 +152,12 @@
             height: 100%;
             background: #22c55e;
             width: 0%;
-            transition: width 10s linear;
+            transition: width 1s ease-in-out;
         }
 
         .blinkit-status { animation: fadeInOut 2s infinite; }
         @keyframes fadeInOut { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
 
-        .promise-card-anim { animation: slideIn 0.5s ease-out; }
-        @keyframes slideIn { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-        .dist-line {
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
-            animation: drawLine 2.5s forwards ease-in-out;
-        }
-        @keyframes drawLine { to { stroke-dashoffset: 0; } }
-
-        .lyric-line {
-            opacity: 0;
-            transform: translateY(10px);
-            animation: lyricFade 1s forwards;
-        }
-        @keyframes lyricFade { to { opacity: 1; transform: translateY(0); } }
-
-        /* Navigation Arrows */
         .nav-btn {
             position: absolute;
             top: 50%;
@@ -201,11 +177,10 @@
             transition: all 0.2s ease;
         }
         .nav-btn:hover { background: #fff5f5; scale: 1.1; }
-        .nav-btn:disabled { opacity: 0; pointer-events: none; }
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         .nav-left { left: -20px; }
         .nav-right { right: -20px; }
 
-        /* Top Left Close Button */
         .modal-close-btn {
             position: absolute;
             top: 1rem;
@@ -222,10 +197,9 @@
             z-index: 110;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
-        .modal-close-btn:hover {
-            color: #f43f5e;
-            scale: 1.1;
-            box-shadow: 0 4px 10px rgba(244, 63, 94, 0.15);
+
+        .delivery-bike { 
+            transition: transform 1s ease-in-out; 
         }
 
         @media (min-width: 640px) {
@@ -236,6 +210,26 @@
 </head>
 <body class="p-4 md:p-8 flex items-center justify-center min-h-screen">
     
+    <!-- Lockout Overlay -->
+    <div id="site-lockout" class="fixed inset-0 bg-black z-[9999] hidden flex-col items-center justify-center p-8 text-center">
+        <div class="max-w-md">
+            <h2 class="text-white text-2xl font-bold mb-6 aesthetic-font">you betrayed me so now going to block all the upcoming dates</h2>
+            <p class="text-gray-400 mb-8 text-sm italic">ask the code from user to unlock</p>
+            <input type="text" id="unlock-code" maxlength="4" placeholder="____" class="bg-gray-900 border-2 border-pink-500 text-white text-3xl tracking-[0.5em] text-center w-full p-4 rounded-2xl mb-6 focus:outline-none">
+            <button onclick="handleUnlock()" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-8 rounded-full w-full transition-all">Unlock</button>
+        </div>
+    </div>
+
+    <!-- Forgiveness Card (Shows after unlock) -->
+    <div id="forgiveness-card" class="fixed inset-0 bg-white/95 backdrop-blur-md z-[9999] hidden flex-col items-center justify-center p-8 text-center">
+        <div class="max-w-md bg-pink-50 p-8 rounded-[3rem] shadow-2xl border-4 border-pink-100">
+            <div class="text-6xl mb-6">💖</div>
+            <h2 class="romantic-title text-3xl text-pink-600 mb-4">maaf krdiya iss baar</h2>
+            <p class="elegant-text text-2xl text-gray-700">aage se ni krunga, stay with me love me and kiss me</p>
+            <button onclick="closeForgiveness()" class="mt-8 bg-pink-500 text-white px-8 py-2 rounded-full font-bold">I Promise ❤️</button>
+        </div>
+    </div>
+
     <div id="calendar-toast-wait" class="toast-msg">Wait for the magic day! ❤️</div>
 
     <div id="countdown-wrapper" class="fixed top-4 right-4 z-40 hidden">
@@ -247,16 +241,17 @@
 
     <div class="max-w-md w-full mx-auto space-y-6 relative">
         <div class="bg-white/85 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-pink-100 relative">
+            <!-- Background Map SVG -->
             <div class="absolute inset-0 z-0 opacity-40 pointer-events-none p-4">
                 <svg viewBox="0 0 1000 1000" class="w-full h-full drop-shadow-lg" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M420,120 L480,150 L520,200 L550,280 L650,320 L720,400 L750,550 L700,680 L620,780 L520,880 L480,950 L440,880 L350,750 L280,600 L250,450 L220,380 L280,280 L350,200 Z" fill="#FFF1F2" stroke="#FDA4AF" stroke-width="3" />
                     <path id="connection-arc" d="M 390 270 Q 425 295 460 330" stroke="#F43F5E" stroke-width="2" stroke-dasharray="6,4" opacity="0.6" />
                     <circle cx="390" cy="270" r="4" fill="#BE185D" />
                     <circle cx="390" cy="270" r="4" stroke="#BE185D" stroke-width="1" fill="none" class="city-pulse" />
-                    <text x="340" y="265" fill="#9D174D" font-size="16" font-weight="bold" font-family="Quicksand">GZB</text>
+                    <text x="340" y="265" fill="#9D174D" font-size="16" font-weight="bold">GZB</text>
                     <circle cx="460" cy="330" r="4" fill="#BE185D" />
                     <circle cx="460" cy="330" r="4" stroke="#BE185D" stroke-width="1" fill="none" class="city-pulse" />
-                    <text x="470" y="345" fill="#9D174D" font-size="16" font-weight="bold" font-family="Quicksand">LKO</text>
+                    <text x="470" y="345" fill="#9D174D" font-size="16" font-weight="bold">LKO</text>
                     <text font-size="28" class="traveling-heart">❤️</text>
                 </svg>
             </div>
@@ -284,56 +279,20 @@
             </div>
         </div>
 
-        <!-- Rules Section -->
         <div id="rules-container" class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-pink-100 overflow-hidden transition-all duration-500">
             <button onclick="toggleRules()" class="w-full p-5 flex items-center justify-center gap-3 text-pink-600 font-bold hover:bg-pink-50 transition-colors">
                 <span class="text-2xl">📜</span>
                 <span class="text-xl aesthetic-font font-bold">Game Rules</span>
                 <span id="chevron" class="transition-transform duration-300 text-sm opacity-50">▼</span>
             </button>
-            
             <div class="rules-content px-0">
                 <div class="rules-paper p-6 text-gray-700 leading-relaxed aesthetic-font text-sm space-y-3">
-                    <div class="flex items-start gap-3">
-                        <span class="text-pink-400 font-bold">01.</span>
-                        <p>One day at a time: Only the heart for the current date will be unlocked.</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-pink-400 font-bold">02.</span>
-                        <p>Answer truthfully: Quizzes are based on our real memories together.</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-pink-400 font-bold">03.</span>
-                        <p>Don't skip the magic: Every correct answer reveals a new part of the story.</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-pink-400 font-bold">04.</span>
-                        <p>Navigation power: Use the arrows on the sides to move back and forth through cards.</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-pink-400 font-bold">05.</span>
-                        <p>Special rewards: Winning mini-games on certain days triggers extra surprises.</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-pink-400 font-bold">06.</span>
-                        <p>Distance doesn't matter: Even if we're 532km apart, the magic travels to you.</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-pink-400 font-bold">07.</span>
-                        <p>Stay hydrated: Love is sweet, but you need water to keep playing! 😉</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-pink-400 font-bold">08.</span>
-                        <p>Snap and share: Send a screenshot whenever you see a delivery animation!</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-pink-400 font-bold">09.</span>
-                        <p>The 7 Vachan: Promise Day is serious business, Agree/Disagree carefully.</p>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <span class="text-pink-400 font-bold">10.</span>
-                        <p>Always smile: The main goal of this game is to keep you happy forever.</p>
-                    </div>
+                    <p>01. One day at a time: Only the heart for the current date will be unlocked.</p>
+                    <p>02. Answer truthfully: Quizzes are based on our real memories together.</p>
+                    <p>03. Dont try to cheat while playing the game</p>
+                    <p>04. whenever the page ask code, contact the coder!</p>
+                    <p>05. Always remeber it, ultimate goal to make you happy</p>
+                    <p>LOVE YOU!</p>
                 </div>
             </div>
         </div>
@@ -342,8 +301,6 @@
     <!-- MAIN INTERACTIVE MODAL -->
     <div id="wish-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-6 overflow-y-auto">
         <div class="relative max-w-sm w-full transition-all duration-300" id="modal-container">
-            
-            <!-- Navigation Arrows -->
             <button id="nav-back" onclick="navigateBack()" class="nav-btn nav-left" disabled>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
@@ -351,7 +308,6 @@
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
             </button>
 
-            <!-- Top Left Close Button -->
             <button onclick="closeModal()" class="modal-close-btn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
@@ -369,38 +325,33 @@
                         <button onclick="checkQuiz()" class="bg-pink-400 hover:bg-pink-500 text-white px-8 py-2 rounded-full font-bold transition-colors w-full mb-2 aesthetic-font">Submit Answer</button>
                     </div>
 
-                    <!-- Day 7: Reward Card -->
+                    <!-- Day 7 Specific Steps (Retained as per instruction) -->
                     <div id="step-reward-7" class="hidden">
                         <div class="w-full h-48 bg-pink-100 rounded-2xl mb-4 overflow-hidden flex items-center justify-center border-2 border-pink-50 relative">
-                             <img src="rose.jpg" alt="Reward" class="w-full h-full object-cover">
-                             <div class="absolute inset-0 bg-pink-900/10"></div>
+                             <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400" alt="Rose" class="w-full h-full object-cover">
                         </div>
-                        <p class="text-gray-600 text-sm mb-6 leading-relaxed italic aesthetic-font">Remember : "Hukana Matata" ... Our first date  ,first roses for you,so my starting of happy days.</p>
+                        <p class="text-gray-600 text-sm mb-6 leading-relaxed italic aesthetic-font">"Hukana Matata" ... Our first date ,first roses for you,so my starting of happy days.</p>
                         <button onclick="showHookQuestion()" class="bg-pink-500 hover:bg-pink-600 text-white px-8 py-2 rounded-full font-bold transition-colors w-full aesthetic-font">Happy</button>
                     </div>
 
-                    <!-- Hook Question -->
                     <div id="step-hook" class="hidden">
                         <p class="text-pink-600 text-lg font-bold mb-6 aesthetic-font">Abhi kaha ja rahi ho cutie, fool nahi chahiye apko?</p>
                         <div class="flex gap-4">
                             <button onclick="handleHookYes()" class="bg-green-400 hover:bg-green-500 text-white px-6 py-2 rounded-full font-bold flex-1 aesthetic-font">Yes</button>
-                            <button onclick="showNoPath()" class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-full font-bold flex-1 aesthetic-font">No</button>
+                            <button onclick="transitionTo('step-propose-forever')" class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-full font-bold flex-1 aesthetic-font">No</button>
                         </div>
                     </div>
 
-                    <!-- Pre Mini-Game Message -->
                     <div id="step-pre-mini-game" class="hidden">
                         <p class="text-pink-600 text-xl font-bold mb-8 aesthetic-font italic">"firstly answer these questions"</p>
                         <button onclick="startMiniGame()" class="bg-pink-500 hover:bg-pink-600 text-white px-8 py-2 rounded-full font-bold transition-colors w-full aesthetic-font">Bring it on!</button>
                     </div>
 
-                    <!-- Mini Game Questions -->
                     <div id="step-mini-game" class="hidden">
                         <p id="mini-game-q" class="text-gray-700 text-lg font-medium mb-8 aesthetic-font leading-relaxed"></p>
                         <div id="mini-game-options" class="flex flex-col gap-3"></div>
                     </div>
 
-                    <!-- Result Card -->
                     <div id="step-result" class="hidden">
                         <div id="result-text-container" class="mb-8">
                             <p id="result-text" class="text-gray-700 text-sm aesthetic-font"></p>
@@ -408,81 +359,84 @@
                         <button id="result-btn" class="bg-pink-500 hover:bg-pink-600 text-white px-8 py-2 rounded-full font-bold transition-colors w-full aesthetic-font"></button>
                     </div>
 
-                    <!-- NEW: Secret Code Input Step -->
                     <div id="step-secret-code" class="hidden">
                         <p class="text-pink-600 text-lg font-bold mb-4 aesthetic-font">Enter the 4-digit secret code</p>
-                        <p class="text-gray-400 text-[10px] mb-4 italic aesthetic-font">hint: ask your one and only lovely baby</p>
-                        <input type="text" id="code-input" maxlength="4" placeholder="____" class="w-full border-2 border-pink-100 rounded-xl p-3 mb-4 text-center focus:outline-none focus:border-pink-300 transition-colors aesthetic-font tracking-[0.5em] text-xl font-bold">
+                        <input type="text" id="code-input" maxlength="4" placeholder="____" class="w-full border-2 border-pink-100 rounded-xl p-3 mb-4 text-center tracking-[0.5em] text-xl font-bold">
                         <p id="code-error" class="text-red-400 text-xs mb-4 hidden">Wrong code, cutie! Try again. ❤️</p>
                         <button onclick="validateSecretCode()" class="bg-pink-500 hover:bg-pink-600 text-white px-8 py-2 rounded-full font-bold transition-colors w-full aesthetic-font">Unlock Surprise</button>
                     </div>
 
-                    <!-- Blinkit Animation -->
                     <div id="step-blinkit" class="hidden text-left">
                         <div class="bg-yellow-50 border border-yellow-100 p-4 rounded-2xl mb-4">
                             <div class="flex justify-between items-center mb-2">
-                                <span class="text-yellow-700 font-bold text-[10px] uppercase tracking-widest aesthetic-font">Blinkit Delivery</span>
-                                <span class="text-green-600 font-bold text-[10px] blinkit-status aesthetic-font" id="delivery-time">in 30 mins will be delivered</span>
-                            </div>
-                            <div class="w-full h-24 bg-white/50 rounded-xl mb-4 border border-yellow-200 overflow-hidden relative">
-                                 <svg viewBox="0 0 100 50" class="w-full h-full opacity-60">
-                                    <path d="M 10 40 Q 50 10 90 40" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="4,2" class="route-path"/>
-                                    <text x="5" y="45" font-size="4" fill="#854d0e" class="aesthetic-font">🏠 Shop</text>
-                                    <text x="80" y="45" font-size="4" fill="#be185d" class="aesthetic-font">👶 Baby</text>
-                                 </svg>
+                                <span class="text-yellow-700 font-bold text-[10px] uppercase">Blinkit Delivery</span>
+                                <span class="text-green-600 font-bold text-[10px] blinkit-status">in 30 mins will be delivered</span>
                             </div>
                             <div class="progress-line rounded-full mb-4">
                                 <div id="progress-bar" class="progress-fill rounded-full"></div>
                             </div>
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 bg-white rounded-full shadow-sm flex items-center justify-center text-xl delivery-bike" id="bike">🚴</div>
-                                <div class="text-xs aesthetic-font">
-                                    <p class="font-bold text-gray-800" id="delivery-status">Order is on the way</p>
+                                <div class="text-xs">
+                                    <p class="font-bold text-gray-800">Order is on the way</p>
                                     <p class="text-gray-500">Shop -> My Baby</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Other Steps (Propose, Chocolate, Teddy, Promise, Hug, Kiss) placeholders -->
+                    <!-- Day 8 Specific Steps -->
                     <div id="step-propose-intro" class="hidden">
-                        <p class="text-pink-600 text-xl font-bold mb-2 aesthetic-font">Will you be my girlfriend?</p>
-                        <p class="text-gray-400 text-sm italic mb-6">...sorry wife!</p>
-                        <button onclick="handleProposeNo()" class="bg-gray-400 text-white px-8 py-2 rounded-full font-bold">NO</button>
-                    </div>
-                    <div id="step-propose-forever" class="hidden text-center">
-                        <p class="text-pink-600 text-2xl font-bold mb-6 romantic-title">You are already my forever ❤️</p>
-                        <button onclick="closeModal()" class="bg-pink-500 hover:bg-pink-600 text-white px-8 py-2 rounded-full font-bold transition-colors w-full">Forever Yours</button>
-                    </div>
-                    <div id="step-chocolate-select" class="hidden text-center">
-                        <p class="text-gray-600 text-md mb-6 font-semibold italic aesthetic-font">Which chocolate you want to eat?</p>
-                        <div class="grid grid-cols-1 gap-2">
-                            <button onclick="handleChocolateSelect('Kit Kat')" class="bg-pink-50 hover:bg-pink-100 text-pink-700 p-3 rounded-xl font-bold aesthetic-font">1. Kit Kat</button>
-                            <button onclick="handleChocolateSelect('Dairy Milk')" class="bg-pink-50 hover:bg-pink-100 text-pink-700 p-3 rounded-xl font-bold aesthetic-font">2. Dairy Milk</button>
-                            <button onclick="handleChocolateSelect('Kinder Joy')" class="bg-pink-50 hover:bg-pink-100 text-pink-700 p-3 rounded-xl font-bold aesthetic-font">3. Kinder Joy</button>
-                            <button onclick="handleChocolateSelect('All')" class="bg-pink-50 hover:bg-pink-100 text-pink-700 p-3 rounded-xl font-bold aesthetic-font">4. All</button>
+                        <h3 class="text-pink-600 text-2xl font-bold mb-2 aesthetic-font">Will you be my girlfriend?</h3>
+                        <p class="elegant-text text-xl text-gray-400 mb-8">:sorry wife</p>
+                        <div class="flex gap-4">
+                            <button onclick="handleProposeYes()" class="bg-green-500 hover:bg-green-600 text-white px-8 py-2 rounded-full font-bold flex-1">Yes</button>
+                            <button onclick="handleProposeNo()" class="bg-gray-400 hover:bg-gray-500 text-white px-8 py-2 rounded-full font-bold flex-1">No</button>
                         </div>
                     </div>
-                    <div id="step-teddy-1" class="hidden text-center">
-                        <p class="text-gray-600 text-sm mb-6 aesthetic-font italic">"this is the teddy i have..."</p>
-                        <button onclick="closeModal()" class="bg-pink-400 text-white px-8 py-2 rounded-full font-bold w-full aesthetic-font">haha</button>
-                    </div>
-                    <div id="step-promise-video-intro" class="hidden text-center">
-                        <div class="w-full aspect-video bg-black rounded-2xl mb-4 flex items-center justify-center text-white aesthetic-font">🎬 Video Intro</div>
-                        <button onclick="closeModal()" class="bg-pink-500 text-white px-8 py-2 rounded-full font-bold w-full aesthetic-font">yes</button>
-                    </div>
-                    <div id="step-hug-1" class="hidden text-center">
-                         <img src="https://images.unsplash.com/photo-1516589174184-c685266e430c?q=80&w=500&auto=format&fit=crop" class="w-full h-48 object-cover rounded-2xl mb-4">
-                         <button onclick="closeModal()" class="bg-pink-500 text-white px-8 py-2 rounded-full font-bold w-full aesthetic-font">next</button>
-                    </div>
-                    <div id="step-kiss-1" class="hidden text-center">
-                         <div class="w-full bg-black rounded-2xl mb-4 overflow-hidden shadow-lg">
-                            <video class="w-full h-auto block" controls autoplay loop muted playsinline>
-                                <source src="kissday.mp4" type="video/mp4">
-                            </video>
+
+                    <div id="step-propose-yes" class="hidden">
+                        <div class="bg-pink-50 p-6 rounded-3xl border-2 border-pink-100 mb-6">
+                            <p class="romantic-title text-3xl text-pink-600 mb-2">hehe,</p>
+                            <p class="elegant-text text-2xl text-gray-700">you are already mine, cutie</p>
                         </div>
-                        <button onclick="closeModal()" class="bg-pink-500 text-white px-8 py-2 rounded-full font-bold w-full aesthetic-font">more</button>
+                        <button onclick="transitionTo('step-propose-final')" class="bg-pink-500 hover:bg-pink-600 text-white px-8 py-2 rounded-full font-bold w-full aesthetic-font">Final</button>
                     </div>
+
+                    <div id="step-propose-final" class="hidden">
+                        <div class="w-full h-65 bg-pink-50 rounded-[2rem] overflow-hidden mb-6 border-2 border-pink-100 shadow-inner">
+                            <img src="photos/final.jpg" alt="Forever" class="w-full h-full object-fit">
+                        </div>
+                        <h3 class="romantic-title text-3xl text-pink-600 mb-3">My Forever Propose day client</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed aesthetic-font italic px-2">
+                            The day you asked me this question,you thought this photo made me laugh at you but i this made me more in love with you. so apne pucha h biwi banane k liye so big yes, can never say no to you for this. i love you and open to marry you anytime.
+                        </p>
+                    </div>
+
+                    <div id="step-propose-no" class="hidden">
+                        <div class="w-full h-48 bg-gray-100 rounded-2xl mb-4 overflow-hidden border-2 border-gray-200">
+                             <img src="https://images.unsplash.com/photo-1594409411656-3da739743c3d?q=80&w=400" alt="Betrayal" class="w-full h-full object-cover">
+                        </div>
+                        <p class="text-rose-600 font-bold text-lg mb-6 aesthetic-font">dediya na dhoka janta tha , ab bdla lunga</p>
+                        <button onclick="handleSorry()" class="bg-black text-white px-8 py-2 rounded-full font-bold w-full aesthetic-font">sorry</button>
+                    </div>
+
+                    <div id="step-propose-forever" class="hidden">
+                        <p class="romantic-title text-2xl text-pink-600 mb-6">You are already my forever ❤️</p>
+                    </div>
+
+                    <!-- Other Day Placeholders -->
+                    <div id="step-chocolate-select" class="hidden">
+                        <p class="mb-4 text-pink-600 font-bold">Which chocolate for my sweetie?</p>
+                        <div class="space-y-2">
+                            <button onclick="transitionTo('step-reward-7')" class="bg-pink-50 w-full p-3 rounded-xl text-pink-700 font-bold">Dairy Milk</button>
+                            <button onclick="transitionTo('step-reward-7')" class="bg-pink-50 w-full p-3 rounded-xl text-pink-700 font-bold">Kit Kat</button>
+                        </div>
+                    </div>
+                    <div id="step-teddy-1" class="hidden">🧸 Coming Soon!</div>
+                    <div id="step-promise-video-intro" class="hidden">🤝 Coming Soon!</div>
+                    <div id="step-hug-1" class="hidden">🫂 Coming Soon!</div>
+                    <div id="step-kiss-1" class="hidden">💋 Coming Soon!</div>
                 </div>
             </div>
         </div>
@@ -495,6 +449,7 @@
         let currentDayActive = null;
         let miniGameScore = 0;
         let miniGameIndex = 0;
+        let photoDropInterval = null;
         
         let historyStack = [];
         let historyPointer = -1;
@@ -503,8 +458,8 @@
 
         const vWeek = {
             7: { name: "Happy Cutie Day!", emoji: "🌹", question: "Tell me the place when i bought you roses for first time?", answer: "hukana matata" },
-            8: { name: "Propose Day", emoji: "💍", question: "Which city is known as the 'City of Love'?", answer: "paris" },
-            9: { name: "Chocolate Day", emoji: "🍫", question: "", answer: "" }, 
+            8: { name: "", emoji: "💍", question: "which month of 2025 we spend most of the time together", answer: "december" },
+            9: { name: "Chocolate Day", emoji: "🍫", question: "What's sweeter than chocolate?", answer: "you" }, 
             10: { name: "Teddy Day", emoji: "🧸", question: "Hundred Acre Wood bear name?", answer: "pooh" },
             11: { name: "Promise Day", emoji: "🤝", question: "Finger for promise?", answer: "pinky" },
             12: { name: "Hug Day", emoji: "🤗", question: "Arms for hug?", answer: "four" },
@@ -522,8 +477,9 @@
         function renderStep(stepId) {
             const steps = [
                 'step-quiz', 'step-reward-7', 'step-hook', 'step-pre-mini-game', 'step-mini-game', 'step-result', 
-                'step-secret-code', 'step-blinkit', 'step-propose-intro', 'step-propose-forever', 
-                'step-chocolate-select', 'step-teddy-1', 'step-promise-video-intro', 'step-hug-1', 'step-kiss-1'
+                'step-secret-code', 'step-blinkit', 'step-propose-intro', 'step-propose-yes', 'step-propose-no', 
+                'step-propose-forever', 'step-chocolate-select', 'step-teddy-1', 'step-promise-video-intro', 
+                'step-hug-1', 'step-kiss-1', 'step-propose-final'
             ];
             steps.forEach(s => {
                 const el = document.getElementById(s);
@@ -538,31 +494,44 @@
             const titleEl = document.getElementById('modal-title');
             const emojiEl = document.getElementById('modal-emoji');
             
-            if (currentDayActive == 7) {
-                if (stepId === 'step-quiz' || stepId === 'step-reward-7') {
-                    titleEl.innerText = vWeek[7].name;
-                    titleEl.classList.remove('hidden');
-                    emojiEl.classList.remove('hidden');
-                } else {
-                    titleEl.classList.add('hidden');
-                    emojiEl.classList.add('hidden');
-                }
+            // For Day 8, hide title and emoji as requested
+            if (currentDayActive == 8) {
+                titleEl.classList.add('hidden');
+                emojiEl.classList.add('hidden');
+            } else if (currentDayActive == 7 && stepId !== 'step-quiz' && stepId !== 'step-reward-7') {
+                titleEl.classList.add('hidden');
+                emojiEl.classList.add('hidden');
             } else {
                 titleEl.classList.remove('hidden');
                 emojiEl.classList.remove('hidden');
             }
         }
 
-        function navigateBack() { if (historyPointer > 0) { historyPointer--; renderStep(historyStack[historyPointer]); } }
-        function navigateForward() { if (historyPointer < historyStack.length - 1) { historyPointer++; renderStep(historyStack[historyPointer]); } }
+        function navigateBack() { 
+            stopPhotoDrop();
+            if (historyPointer > 0) { historyPointer--; renderStep(historyStack[historyPointer]); } 
+        }
+        function navigateForward() { 
+            stopPhotoDrop();
+            if (historyPointer < historyStack.length - 1) { historyPointer++; renderStep(historyStack[historyPointer]); } 
+        }
 
         function showWish(day) {
+            const now = new Date().getTime();
+            const dayDate = new Date(`February ${day}, 2026 00:00:00`).getTime();
+            
+            if (!DEV_MODE && now < dayDate) {
+                showToast("Wait for the magic day! ❤️");
+                return;
+            }
+
             currentDayActive = day;
             const container = document.getElementById('modal-container');
             container.className = day === 13 ? "relative max-w-md w-full transition-all duration-300" : "relative max-w-sm w-full transition-all duration-300";
             historyStack = []; historyPointer = -1;
             
             document.getElementById('modal-emoji').innerText = "❓";
+            document.getElementById('modal-title').innerText = vWeek[day].name;
             document.getElementById('quiz-question').innerText = vWeek[day].question;
             document.getElementById('quiz-answer').value = "";
             document.getElementById('quiz-error').classList.add('hidden');
@@ -582,7 +551,66 @@
                 else if (currentDayActive == 8) transitionTo('step-propose-intro');
                 else if (currentDayActive == 13) transitionTo('step-kiss-1');
                 else transitionTo('step-reward-7');
+                spawnEmojis(data.emoji);
             } else { document.getElementById('quiz-error').classList.remove('hidden'); }
+        }
+
+        function handleProposeYes() {
+            transitionTo('step-propose-yes');
+            startPhotoDrop();
+        }
+
+        function handleProposeNo() {
+            transitionTo('step-propose-no');
+        }
+
+        function handleSorry() {
+            closeModal();
+            document.getElementById('site-lockout').classList.remove('hidden');
+        }
+
+        function handleUnlock() {
+            const code = document.getElementById('unlock-code').value;
+            if (code === "0000") {
+                document.getElementById('site-lockout').classList.add('hidden');
+                document.getElementById('forgiveness-card').classList.remove('hidden');
+            } else {
+                showToast("Wrong code! Ask correctly. ❤️");
+            }
+        }
+
+        function closeForgiveness() {
+            document.getElementById('forgiveness-card').classList.add('hidden');
+        }
+
+        function startPhotoDrop() {
+            stopPhotoDrop();
+            const photos = [
+                "photos/1.jpg",
+                "photos/2.jpg",
+                "photos/3.jpg",
+                "photos/4.jpg",
+                "photos/5.jpg",
+                "photos/6.jpg",
+                "photos/7.jpg",
+                "photos/10.jpg",
+                "photos/9.jpg",
+                "photos/8.jpg",
+            ];
+            photoDropInterval = setInterval(() => {
+                const img = document.createElement('img');
+                img.src = photos[Math.floor(Math.random() * photos.length)];
+                img.className = 'dropping-photo';
+                img.style.left = Math.random() * 90 + 'vw';
+                img.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                document.body.appendChild(img);
+                setTimeout(() => img.remove(), 6000);
+            }, 600);
+        }
+
+        function stopPhotoDrop() {
+            if (photoDropInterval) clearInterval(photoDropInterval);
+            document.querySelectorAll('.dropping-photo').forEach(p => p.remove());
         }
 
         function showHookQuestion() { transitionTo('step-hook'); }
@@ -606,8 +634,14 @@
             optContainer.innerHTML = '';
             qData.options.forEach(opt => {
                 const b = document.createElement('button');
-                b.className = "bg-white hover:bg-pink-50 text-gray-700 py-3 px-4 rounded-2xl text-sm font-medium border border-gray-100 transition-all text-left aesthetic-font shadow-sm";
-                b.innerText = opt; b.onclick = () => { if(opt.includes(qData.a)) miniGameScore++; miniGameIndex++; if(miniGameIndex<3) renderMiniGameQuestion(); else showGameResult(); };
+                b.className = "bg-white hover:bg-pink-50 text-gray-700 py-3 px-4 rounded-2xl text-sm font-medium border border-gray-100 transition-all text-left shadow-sm";
+                b.innerText = opt; 
+                b.onclick = () => { 
+                    if(opt.includes(qData.a)) miniGameScore++; 
+                    miniGameIndex++; 
+                    if(miniGameIndex < 3) renderMiniGameQuestion(); 
+                    else showGameResult(); 
+                };
                 optContainer.appendChild(b);
             });
         }
@@ -621,7 +655,7 @@
                 resBtn.innerText = "Check Surprise";
                 resBtn.onclick = () => transitionTo('step-secret-code');
             } else {
-                resText.innerHTML = `<span class="elegant-text text-3xl text-rose-500">Opps you lost... 🥀</span><p class="mt-2 text-gray-500 aesthetic-font">But won my heart! Still get a surprise.</p>`;
+                resText.innerHTML = `<span class="elegant-text text-3xl text-rose-500">Oops you lost... 🥀</span><p class="mt-2 text-gray-500 aesthetic-font">But won my heart! Still get a surprise.</p>`;
                 resBtn.innerText = "Check Surprise";
                 resBtn.onclick = () => { transitionTo('step-blinkit'); startBlinkitAnimation(); };
             }
@@ -642,14 +676,12 @@
         function startBlinkitAnimation() {
             const bar = document.getElementById('progress-bar');
             const bike = document.getElementById('bike');
-            setTimeout(() => { bar.style.width = "95%"; bike.style.transform = "translateX(240px)"; spawnEmojis('🌹'); }, 500);
+            setTimeout(() => { 
+                if (bar) bar.style.width = "95%"; 
+                if (bike) bike.style.transform = "translateX(200px)"; 
+                spawnEmojis('🌹'); 
+            }, 500);
         }
-
-        function handleProposeNo() { transitionTo('step-propose-forever'); }
-        function handleChocolateSelect() { /* day 9 logic */ }
-        function showTeddy2() { /* day 10 logic */ }
-        function showHug2() { /* day 12 logic */ }
-        function showKiss2() { /* day 13 logic */ }
 
         function toggleRules() {
             const container = document.getElementById('rules-container');
@@ -661,10 +693,10 @@
             const c = document.getElementById('calendar-days');
             for (let i = 1; i <= 28; i++) {
                 const d = document.createElement('div');
-                d.className = `day-card relative flex items-center justify-center rounded-xl border border-pink-50 text-[10px] font-semibold text-gray-700 bg-pink-50/30`;
+                const isSpecial = vWeek[i];
+                d.className = `day-card relative flex items-center justify-center rounded-xl border border-pink-50 text-[10px] font-semibold text-gray-700 ${isSpecial ? 'bg-rose-100 border-rose-300 cursor-pointer hover:scale-105 z-10' : 'bg-pink-50/30'}`;
                 d.innerHTML = `<span>${i}</span>`;
-                if (vWeek[i]) {
-                    d.classList.add('cursor-pointer', 'bg-rose-100', 'border-rose-300', 'hover:scale-105', 'z-10');
+                if (isSpecial) {
                     d.onclick = () => showWish(i);
                     d.innerHTML += `<div class="heart-pulse text-[8px] absolute bottom-1">❤️</div>`;
                 }
@@ -681,14 +713,40 @@
                 if (d < 0) { w.classList.add('hidden'); return; }
                 w.classList.remove('hidden');
                 const ds = Math.floor(d / (1000 * 60 * 60 * 24));
+                const hs = Math.floor((d % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const ms = Math.floor((d % (1000 * 60 * 60)) / (1000 * 60));
                 const ss = Math.floor((d % (1000 * 60)) / 1000);
-                t.innerText = `${ds.toString().padStart(2,'0')}:...:${ss.toString().padStart(2,'0')}`;
+                t.innerText = `${ds.toString().padStart(2,'0')}:${hs.toString().padStart(2,'0')}:${ms.toString().padStart(2,'0')}:${ss.toString().padStart(2,'0')}`;
             };
             up(); setInterval(up, 1000);
         }
 
-        function spawnEmojis(e) { for (let i = 0; i < 20; i++) { setTimeout(() => { const el = document.createElement('div'); el.className = 'emoji-particle'; el.innerText = e; el.style.left = Math.random() * 100 + 'vw'; el.style.top = '110vh'; document.body.appendChild(el); setTimeout(() => el.remove(), 3000); }, i * 50); } }
-        function closeModal() { document.getElementById('wish-modal').classList.remove('modal-active'); }
+        function spawnEmojis(e) { 
+            for (let i = 0; i < 20; i++) { 
+                setTimeout(() => { 
+                    const el = document.createElement('div'); 
+                    el.className = 'emoji-particle'; 
+                    el.innerText = e; 
+                    el.style.left = Math.random() * 100 + 'vw'; 
+                    el.style.top = '110vh'; 
+                    document.body.appendChild(el); 
+                    setTimeout(() => el.remove(), 3000); 
+                }, i * 50); 
+            } 
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('calendar-toast-wait');
+            toast.innerText = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => toast.style.opacity = '0', 3000);
+        }
+
+        function closeModal() { 
+            stopPhotoDrop();
+            document.getElementById('wish-modal').classList.remove('modal-active'); 
+        }
+        
         window.onload = () => { startCountdown(); initCalendar(); };
     </script>
 </body>
